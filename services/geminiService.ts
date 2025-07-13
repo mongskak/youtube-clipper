@@ -61,7 +61,7 @@ export const generateTopics = async (youtubeUrl: string, transcript: string): Pr
         ${transcript}
         --- TRANSKRIP SELESAI ---
 
-        Berdasarkan transkrip yang diberikan, identifikasi setidaknya 10 klip viral potensial, masing-masing berdurasi antara 30 dan 60 detik.
+        Berdasarkan transkrip yang diberikan, identifikasi setidaknya 20 klip viral potensial, masing-masing berdurasi antara 30 dan 60 detik.
         Penting: Waktu mulai (startTime) dan waktu akhir (endTime) yang Anda berikan HARUS sesuai dengan waktu sebenarnya di video YouTube. Analisis transkrip untuk memperkirakan waktu ini seakurat mungkin.
         Pastikan setiap klip memiliki judul yang menarik, hook yang kuat, dan caption yang menarik untuk media sosial.
 
