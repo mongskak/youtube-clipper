@@ -1,0 +1,6 @@
+{
+  "name": "Pencari Klip Viral",
+  "description": "Aplikasi bertenaga AI yang menganalisis transkrip dan tautan video YouTube untuk menghasilkan ide konten pendek yang berpotensi viral, lengkap dengan hook, caption, dan stempel waktu.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
