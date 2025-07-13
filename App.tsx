@@ -17,6 +17,8 @@ const getYouTubeId = (url: string): string | null => {
 const App: React.FC = () => {
     const [youtubeUrl, setYoutubeUrl] = useState<string>('');
     const [transcript, setTranscript] = useState<string>('');
+    const [clipCount, setClipCount] = useState<string>('10');
+    const [clipDuration, setClipDuration] = useState<string>('30 - 60 detik');
     const [topics, setTopics] = useState<Topic[]>([]);
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ const App: React.FC = () => {
         setVideoId(id);
 
         try {
-            const result = await generateTopics(youtubeUrl, transcript);
+            const result = await generateTopics(youtubeUrl, transcript, clipCount, clipDuration);
             setTopics(result);
         } catch (err) {
             console.error(err);
@@ -49,7 +51,7 @@ const App: React.FC = () => {
         } finally {
             setIsLoading(false);
         }
-    }, [youtubeUrl, transcript]);
+    }, [youtubeUrl, transcript, clipCount, clipDuration]);
 
     return (
         <div className="min-h-screen bg-gray-900 text-gray-200 font-sans">
@@ -63,6 +65,10 @@ const App: React.FC = () => {
                         setTranscript={setTranscript}
                         onGenerate={handleGenerate}
                         isLoading={isLoading}
+                        clipCount={clipCount}
+                        setClipCount={setClipCount}
+                        clipDuration={clipDuration}
+                        setClipDuration={setClipDuration}
                     />
                     
                     {error && (

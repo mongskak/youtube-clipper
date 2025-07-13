@@ -23,7 +23,7 @@ const responseSchema = {
             },
             caption: {
                 type: Type.STRING,
-                description: "Keterangan siap pakai untuk platform seperti TikTok, Instagram Reels, atau YouTube Shorts. Sertakan tagar yang relevan.",
+                description: "Keterangan siap pakai untuk TikTok, Instagram Reels, atau YouTube Shorts. Sertakan tagar relevan dan selalu sertakan #fyp.",
             },
             startTime: {
                 type: Type.INTEGER,
@@ -35,7 +35,7 @@ const responseSchema = {
             },
             duration: {
                 type: Type.INTEGER,
-                description: "Total durasi klip dalam detik. Harus antara 30 dan 60.",
+                description: "Total durasi klip dalam detik.",
             },
             viralPotential: {
                 type: Type.STRING,
@@ -46,8 +46,24 @@ const responseSchema = {
     },
 };
 
-export const generateTopics = async (youtubeUrl: string, transcript: string): Promise<Topic[]> => {
+export const generateTopics = async (youtubeUrl: string, transcript: string, clipCount: string, clipDuration: string): Promise<Topic[]> => {
     const model = 'gemini-2.5-flash';
+
+    const countInstruction = !clipCount
+        ? `identifikasi jumlah klip yang optimal dengan topik yang menarik, edukatif, relevan dan viral potensial. Fokus pada kualitas daripada kuantitas.`
+        : `Berdasarkan transkrip yang diberikan, identifikasi sekitar ${clipCount} klip dengan topik yang menarik, edukatif, relevan dan viral potensial.`;
+
+    const durationInstruction = !clipDuration
+        ? `Tentukan durasi yang paling cocok untuk setiap klip agar viral, idealnya antara 15 hingga 90 detik.`
+        : `Durasi untuk setiap klip harus ${clipDuration}.`;
+
+    const durationSchemaDescription = !clipDuration
+        ? `Total durasi klip dalam detik yang dioptimalkan oleh AI untuk potensi viral.`
+        : `Total durasi klip dalam detik. Harus sesuai dengan rentang durasi yang diminta (${clipDuration}).`;
+    
+    // Create a mutable copy of the schema to avoid side effects and update description dynamically
+    const dynamicSchema = JSON.parse(JSON.stringify(responseSchema));
+    dynamicSchema.items.properties.duration.description = durationSchemaDescription;
 
     const prompt = `
         Anda adalah 'Viral Vision AI', seorang manajer media sosial ahli dan editor video yang berspesialisasi dalam mengidentifikasi dan membuat klip video pendek viral dari konten yang lebih panjang. Analisis Anda tajam, kreatif, dan fokus untuk memaksimalkan keterlibatan audiens.
@@ -61,9 +77,11 @@ export const generateTopics = async (youtubeUrl: string, transcript: string): Pr
         ${transcript}
         --- TRANSKRIP SELESAI ---
 
-        Berdasarkan transkrip yang diberikan, identifikasi setidaknya 20 klip viral potensial, masing-masing berdurasi antara 30 dan 60 detik.
+        ${countInstruction}
+        ${durationInstruction}
+        
         Penting: Waktu mulai (startTime) dan waktu akhir (endTime) yang Anda berikan HARUS sesuai dengan waktu sebenarnya di video YouTube. Analisis transkrip untuk memperkirakan waktu ini seakurat mungkin.
-        Pastikan setiap klip memiliki judul yang menarik, hook yang kuat, dan caption yang menarik untuk media sosial.
+        Pastikan setiap klip memiliki judul yang menarik, hook yang kuat, dan caption yang menarik untuk media sosial. Untuk caption, selalu sertakan hashtag #fyp di antara tagar relevan lainnya.
 
         Untuk setiap klip, berikan informasi yang diminta sesuai skema JSON.
     `;
@@ -74,7 +92,7 @@ export const generateTopics = async (youtubeUrl: string, transcript: string): Pr
             contents: prompt,
             config: {
                 responseMimeType: "application/json",
-                responseSchema: responseSchema,
+                responseSchema: dynamicSchema,
                 temperature: 0.7,
             },
         });
